@@ -1,0 +1,325 @@
+---
+title: "summary"
+author: "llxy"
+date: "30/11/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r import}
+library(STutility)
+library(Seurat)
+library(tidyverse)
+library(rhdf5)
+library(hdf5r)
+#install_github('linxihui/NNLM')
+library(NNLM)
+# load
+
+sample_A78 <- "E:/stAMD/Ulrike_GEX_reorient_078_A1/outs/filtered_feature_bc_matrix.h5"
+spotfile_A78 <- "E:/stAMD/Ulrike_GEX_reorient_078_A1/outs/spatial/tissue_positions_list.csv"
+imgs_A78 <- "E:/stAMD/Ulrike_GEX_reorient_078_A1/outs/spatial/tissue_hires_image.png"
+json_A78 <- "E:/stAMD/Ulrike_GEX_reorient_078_A1/outs/spatial/scalefactors_json.json"
+
+sample_B78 <- "E:/stAMD/Ulrike_GEX_reorient_078_B1/outs/filtered_feature_bc_matrix.h5"
+spotfile_B78 <- "E:/stAMD/Ulrike_GEX_reorient_078_B1/outs/spatial/tissue_positions_list.csv"
+imgs_B78 <- "E:/stAMD/Ulrike_GEX_reorient_078_B1/outs/spatial/tissue_hires_image.png"
+json_B78 <- "E:/stAMD/Ulrike_GEX_reorient_078_B1/outs/spatial/scalefactors_json.json"
+
+
+sample_C78 <- "E:/stAMD/Ulrike_GEX_reorient_078_C1/outs/filtered_feature_bc_matrix.h5"
+spotfile_C78 <- "E:/stAMD/Ulrike_GEX_reorient_078_C1/outs/spatial/tissue_positions_list.csv"
+imgs_C78 <- "E:/stAMD/Ulrike_GEX_reorient_078_C1/outs/spatial/tissue_hires_image.png"
+json_C78 <- "E:/stAMD/Ulrike_GEX_reorient_078_C1/outs/spatial/scalefactors_json.json"
+
+
+sample_D78 <- "E:/stAMD/Ulrike_GEX_reorient_078_D1/outs/filtered_feature_bc_matrix.h5"
+spotfile_D78 <- "E:/stAMD/Ulrike_GEX_reorient_078_D1/outs/spatial/tissue_positions_list.csv"
+imgs_D78 <- "E:/stAMD/Ulrike_GEX_reorient_078_D1/outs/spatial/tissue_hires_image.png"
+json_D78 <- "E:/stAMD/Ulrike_GEX_reorient_078_D1/outs/spatial/scalefactors_json.json"
+# load
+
+sample_A79 <- "E:/stAMD/Ulrike_GEX_reorient_079_A1/outs/filtered_feature_bc_matrix.h5"
+spotfile_A79 <- "E:/stAMD/Ulrike_GEX_reorient_079_A1/outs/spatial/tissue_positions_list.csv"
+imgs_A79 <- "E:/stAMD/Ulrike_GEX_reorient_079_A1/outs/spatial/tissue_hires_image.png"
+json_A79 <- "E:/stAMD/Ulrike_GEX_reorient_079_A1/outs/spatial/scalefactors_json.json"
+
+sample_B79 <- "E:/stAMD/Ulrike_GEX_reorient_079_B1/outs/filtered_feature_bc_matrix.h5"
+spotfile_B79 <- "E:/stAMD/Ulrike_GEX_reorient_079_B1/outs/spatial/tissue_positions_list.csv"
+imgs_B79 <- "E:/stAMD/Ulrike_GEX_reorient_079_B1/outs/spatial/tissue_hires_image.png"
+json_B79 <- "E:/stAMD/Ulrike_GEX_reorient_079_B1/outs/spatial/scalefactors_json.json"
+
+
+sample_C79 <- "E:/stAMD/Ulrike_GEX_reorient_079_C1/outs/filtered_feature_bc_matrix.h5"
+spotfile_C79 <- "E:/stAMD/Ulrike_GEX_reorient_079_C1/outs/spatial/tissue_positions_list.csv"
+imgs_C79 <- "E:/stAMD/Ulrike_GEX_reorient_079_C1/outs/spatial/tissue_hires_image.png"
+json_C79 <- "E:/stAMD/Ulrike_GEX_reorient_079_C1/outs/spatial/scalefactors_json.json"
+
+
+sample_D79 <- "E:/stAMD/Ulrike_GEX_reorient_079_D1/outs/filtered_feature_bc_matrix.h5"
+spotfile_D79 <- "E:/stAMD/Ulrike_GEX_reorient_079_D1/outs/spatial/tissue_positions_list.csv"
+imgs_D79 <- "E:/stAMD/Ulrike_GEX_reorient_079_D1/outs/spatial/tissue_hires_image.png"
+json_D79 <- "E:/stAMD/Ulrike_GEX_reorient_079_D1/outs/spatial/scalefactors_json.json"
+
+
+infoTable <-  data.frame(matrix(NA, nrow = 8, ncol = 4))
+
+colnames(infoTable) <- c("samples", "spotfiles", "imgs", "json")
+infoTable$samples = c(sample_A79, sample_B79, sample_C79, sample_D79, sample_A78, sample_B78, sample_C78, sample_D78)
+infoTable$spotfiles = c(spotfile_A79,spotfile_B79, spotfile_C79, spotfile_D79, spotfile_A78,spotfile_B78, spotfile_C78, spotfile_D78) 
+infoTable$imgs = c(imgs_A79, imgs_B79, imgs_C79, imgs_D79, imgs_A78, imgs_B78, imgs_C78, imgs_D78)
+infoTable$json = c(json_A79, json_B79, json_C79, json_D79, json_A78, json_B78, json_C78, json_D78) 
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r infoTable, echo=FALSE}
+infoTable
+se <- InputFromTable(infotable = infoTable, 
+                     min.gene.count = 100, 
+                     min.gene.spots = 5,
+                     min.spot.count = 500,
+                     platform =  "Visium")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r st_raw, fig.height= 16, fig.width = 8 }
+ST.FeaturePlot(se, features = c("nFeature_RNA"), cols = c("lightgray", "mistyrose", "red", "darkred", "black"), ncol = 2, pt.size = 1.3)
+```
+
+
+```{r filtering}
+se.subset <- SubsetSTData(se, expression = nFeature_RNA > 300)
+cat("Spots removed: ", ncol(se) - ncol(se.subset), "\n")
+```
+
+```{r}
+se = se.subset
+se <- LoadImages(se, time.resolve = FALSE, verbose = TRUE)
+ImagePlot(se, method = "raster", type = "raw", ncols = 4)
+```
+
+```{r, rotate}
+transforms <- list("8" = list("angle" = 180))
+se <- WarpImages(se, transforms)
+pdf('01_raw_picture.pdf', height = 6, width = 12)
+ImagePlot(se, method = "raster", ncols = 4)
+dev.off()
+```
+
+
+```{r feature}
+
+# features
+p1 <- ggplot() +
+  geom_histogram(data = se[[]], aes(nFeature_RNA), fill = "red", alpha = 0.7, bins = 50) +
+  ggtitle("Unique genes per spot")
+
+p2 <- ggplot() +
+  geom_histogram(data = se[[]], aes(nCount_RNA), fill = "red", alpha = 0.7, bins = 50) +
+  ggtitle("Total counts per spots")
+
+gene_attr <- data.frame(nUMI = Matrix::rowSums(se@assays$RNA@counts), 
+                        nSpots = Matrix::rowSums(se@assays$RNA@counts > 0))
+p3 <- ggplot() +
+  geom_histogram(data = gene_attr, aes(nUMI), fill = "red", alpha = 0.7, bins = 50) +
+  scale_x_log10() +
+  ggtitle("Total counts per gene (log10 scale)")
+
+p4 <- ggplot() +
+  geom_histogram(data = gene_attr, aes(nSpots), fill = "red", alpha = 0.7,  bins = 50) +
+  ggtitle("Total spots per gene")
+
+(p1 - p2)/(p3 - p4)
+
+```
+
+
+```{r mito, fig.height= 6, fig.width = 12}
+mt.genes <- grep(pattern = "^mt-", x = rownames(se), value = TRUE)
+se$percent.mito <- (Matrix::colSums(se@assays$RNA@counts[mt.genes, ])/Matrix::colSums(se@assays$RNA@counts))*100
+ST.FeaturePlot(se, features = "percent.mito", cols = c("lightgray", "mistyrose", "red", "dark red", "black"), pt.size = 1.3, ncol = 4)
+```
+
+```{r ribo, fig.height=6, fig.width = 12}
+# Collect all genes coding for ribosomal proteins
+rp.genes <- grep(pattern = "^Rpl|^Rps", x = rownames(se), value = TRUE)
+se$percent.ribo <- (Matrix::colSums(se@assays$RNA@counts[rp.genes, ])/Matrix::colSums(se@assays$RNA@counts))*100
+ST.FeaturePlot(se, features = "percent.ribo", cols = c("lightgray", "mistyrose", "red", "dark red", "black"), pt.size = 1.3, ncol = 4)
+```
+
+
+```{r mito filter}
+# Keep spots with more than 500 unique genes and less than 30% mitochondrial content
+se.subset <- SubsetSTData(se, expression = nFeature_RNA > 500 & percent.mito < 30)
+
+cat("Spots removed: ", ncol(se) - ncol(se.subset), "\n")
+se = se.subset
+```
+
+
+```{r, integration}
+se <- SCTransform(se)
+# Add a section column to your meta.data
+se$section <- paste0("section_", GetStaffli(se)[[, "sample", drop = T]])
+
+# Run normalization with "vars.to.regress" option
+se.batch.cor <- SCTransform(se, vars.to.regress = "section")
+
+
+se <- se.batch.cor
+```
+
+
+```{r 1}
+library(Matrix)
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+
+# Get raw count data 
+umi_data <- GetAssayData(object = se, slot = "counts", assay = "RNA")
+dim(umi_data)
+
+# Calculate gene attributes
+gene_attr <- data.frame(mean = rowMeans(umi_data),
+                        detection_rate = rowMeans(umi_data > 0),
+                        var = apply(umi_data, 1, var), 
+                        row.names = rownames(umi_data)) %>%
+  mutate(log_mean = log10(mean), log_var = log10(var))
+
+# Obtain spot attributes from Seurat meta.data slot
+spot_attr <- se[[c("nFeature_RNA", "nCount_RNA")]]
+
+p1 <- ggplot(gene_attr, aes(log_mean, log_var)) + 
+  geom_point(alpha = 0.3, shape = 16) + 
+  geom_density_2d(size = 0.3) +
+  geom_abline(intercept = 0, slope = 1, color = 'red') +
+  ggtitle("Mean-variance relationship")
+
+# add the expected detection rate under Poisson model
+x = seq(from = -2, to = 2, length.out = 1000)
+poisson_model <- data.frame(log_mean = x, detection_rate = 1 - dpois(0, lambda = 10^x))
+p2 <- ggplot(gene_attr, aes(log_mean, detection_rate)) + 
+  geom_point(alpha = 0.3, shape = 16) + 
+  geom_line(data = poisson_model, color='red') +
+  ggtitle("Mean-detection-rate relationship")
+
+p1 - p2
+#############
+```
+
+
+```{r, Variablefeature}
+head(VariableFeatures(se))
+```
+
+
+```{r, variable_feature}
+FeatureOverlay(se, features = VariableFeatures(se)[1:6], 
+                     sampleids = 1,
+                     cols = c("lightgray", "mistyrose", "red", "darkred", "black"),
+                     pt.size = 1.5, 
+                     add.alpha = TRUE,
+                     ncol = 3)
+```
+
+
+```{r NMF}
+se <- RunNMF(se, nfactors = 40)
+print(se[["NMF"]])
+```
+
+
+```{r umap， }
+se <- FindNeighbors(object = se, verbose = FALSE, reduction = "NMF", dims = 1:40)
+se <- FindClusters(object = se, verbose = FALSE)
+
+library(RColorBrewer)
+n <- 20
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+
+#ST.FeaturePlot(object = se, features = "seurat_clusters", cols = col_vector, pt.size = 1, ncol = 2)
+se <- RunUMAP(se, reduction = "NMF", dims = 1:40, n.neighbors = 10)
+```
+
+```{r color}
+colset  = c('#696969', '#2e8b57', '#800000', '#191970', '#808000','#ff0000', '#ffa500', '#7cfc00', 
+            '#ba55d3', '#00ffff', '#0000ff', '#f08080', '#ff00ff', '#1e90ff', '#eee8aa', '#ffff54',
+            '#dda0dd', '#ff1493', '#98fb98', '#87cefa')
+names(colset) = levels(se)
+```
+
+```{r overlay, fig.height= 8, fig.width=18}
+FeatureOverlay(se, features = "seurat_clusters", sampleids = 1:8, ncols = 4, pt.size = 1.25, cols = colset)
+```
+
+
+```{r st, fig.height= 8, fig.width=16}
+p = ST.FeaturePlot(se, features = "seurat_clusters", ncol = 4, show.sb = FALSE, cols = colset)
+p & theme_bw()
+```
+
+
+```{r umap_ident_vs_section, fig.height = 6, fig.width = 15}
+p1 = DimPlot(se, reduction = "umap", group.by = "ident", cols= colset)
+p2 = DimPlot(se, reduction = "umap", group.by = "section", cols =c('darkgreen', "red","gold", "mediumvioletred","#00ff00",  "blue", "dodgerblue", "plum"))
+p1 + p2
+```
+```{r change_label}
+new.cluster.ids = read.delim("Idents.txt", header = F)
+new.cluster.ids <- new.cluster.ids$V1 %>% as.character()
+
+names(new.cluster.ids) = levels(se)
+
+se <- RenameIdents(se, new.cluster.ids)
+
+se@meta.data$labels = Idents(se)
+
+names(colset) = levels(se)
+DimPlot(se, cols = colset) 
+
+
+```
+
+
+```{r, fig.height= 8, fig.width=16}
+p = ST.FeaturePlot(se, features = 'labels', ncol = 4, show.sb = FALSE, cols = colset)
+p & theme_bw()
+```
+
+
+```{r overlay-relabel, fig.height= 8, fig.width=18}
+FeatureOverlay(se, features = "labels", sampleids = 1:8, ncols = 4, pt.size = 1.25, cols = colset)
+```
+
+
+```{r}
+saveRDS(se, 'se.rds')
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
